@@ -1,4 +1,3 @@
-from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING
 
 from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
@@ -14,4 +13,4 @@ if TYPE_CHECKING:
 class User(Base, IntIdPkMixin, SQLAlchemyBaseUserTable[UserIdType]):
     @classmethod
     def get_db(cls, session: "AsyncSession"):
-        return SQLAlchemyUserDatabase(session, User)
+        return SQLAlchemyUserDatabase(session, cls)
