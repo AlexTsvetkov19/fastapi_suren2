@@ -17,6 +17,14 @@ class ApiPrefix(BaseModel):
     prefix: str = "/api"
     v1: ApiV1Prefix = ApiV1Prefix()
 
+    @property
+    def bearer_token_url(self) -> str:
+        # api/v1/auth/login
+        parts = (self.prefix, self.v1.prefix, self.v1.auth, "/login")
+        path = "".join(parts)
+        # return path[1:]
+        return path.removeprefix("/")
+
 
 class DatabaseConfig(BaseModel):
     url: PostgresDsn
@@ -35,8 +43,8 @@ class DatabaseConfig(BaseModel):
 
 class AccessToken(BaseModel):
     lifetime_seconds: int = 3600
-    reset_password_token_secret: str
-    verification_token_secret: str
+    reset_password_token_secret: str | None = None
+    verification_token_secret: str | None = None
 
 
 class Settings(BaseSettings):
