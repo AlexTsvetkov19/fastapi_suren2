@@ -12,10 +12,15 @@ router = APIRouter(
 # /login
 # /logout
 router.include_router(
-    router=fastapi_users.get_auth_router(authentication_backend,),
+    router=fastapi_users.get_auth_router(
+        authentication_backend,
+    ),
 )
 
 # /register
 router.include_router(
-    fastapi_users.get_register_router(UserRead, UserCreate,),
+    fastapi_users.get_register_router(
+        UserRead,
+        UserCreate,
+    ),
 )
