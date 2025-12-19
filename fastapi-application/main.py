@@ -1,31 +1,47 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 import uvicorn
-
 from core.config import settings
 from api import router as api_router
-
+from views import router as views_router
+from api.webhooks import webhooks_router
 from core.models import db_helper
+from core import broker
+
+logging.basicConfig(
+    level=settings.logging.log_level_value,
+    format=settings.logging.log_format,
+)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup
+    await broker.startup()
     yield
     # shutdown
     await db_helper.dispose()
+    await broker.shutdown()
+
 
 main_app = FastAPI(
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
+    webhooks=webhooks_router,
 )
 main_app.include_router(
     api_router,
 )
 
-if __name__ == '__main__':
+main_app.include_router(
+    views_router,
+)
+
+
+if __name__ == "__main__":
     uvicorn.run(
         "main:main_app",
         host=settings.run.host,

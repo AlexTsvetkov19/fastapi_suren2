@@ -7,6 +7,7 @@ from core.config import settings
 from core.types.user_id import UserIdType
 from fastapi import Request
 
+from utils.webhooks.user import send_new_user_notification
 
 log = logging.getLogger(__name__)
 
@@ -24,6 +25,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, UserIdType]):
             "User %r has registered.",
             user.id,
         )
+
+        # new action: send webhook
+        await send_new_user_notification(user)
 
     async def on_after_request_verify(
         self,
